@@ -3,6 +3,10 @@ import styled, { ThemeProvider } from 'styled-components'
 import Menu from './components/Menu'
 import Navbar from './components/Navbar'
 import { darkTheme, lightTheme } from './utils/Theme'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Video from './pages/Video'
+import Login from './pages/Login'
 
 const Container = styled.div`
   display: flex;
@@ -18,86 +22,28 @@ const Wrapper = styled.div`
 `
 
 function App() {
-  const [darkMode, setDarkMode] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <Container>
-        <Menu darkMode={darkMode} setDarkMode={setDarkMode} />
-        <Main>
-          <Navbar />
-          <Wrapper>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-            <div>VideoCard</div>
-          </Wrapper>
-        </Main>
+        <BrowserRouter>
+          <Menu darkMode={darkMode} setDarkMode={setDarkMode} />
+          <Main>
+            <Navbar />
+            <Wrapper>
+              <Routes>
+                <Route path='/'>
+                  <Route index element={<Home />} />
+                  <Route path='signin' element={<Login />} />
+                  <Route path='video'>
+                    <Route path=':videoId' element={<Video />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </Wrapper>
+          </Main>
+        </BrowserRouter>
       </Container>
     </ThemeProvider>
   )

@@ -16,6 +16,7 @@ import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined'
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined'
 import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined'
 import logo from '../img/logo.png'
+import { Link } from 'react-router-dom'
 
 const Container = styled.div`
   flex: 1;
@@ -56,6 +57,8 @@ const Item = styled.div`
   }
 `
 
+const Login = styled.div``
+
 const Button = styled.button`
   display: flex;
   align-items: center;
@@ -75,6 +78,7 @@ const Title = styled.h2`
   font-weight: 500;
   color: #aaaaaa;
   margin-bottom: 20px;
+  text-transform: uppercase;
 `
 
 const Hr = styled.hr`
@@ -86,14 +90,18 @@ const Menu = ({ darkMode, setDarkMode }) => {
   return (
     <Container>
       <Wrapper>
-        <Logo>
-          <Img src={logo} alt={logo} />
-          NaskoTube
-        </Logo>
-        <Item>
-          <HomeIcon />
-          Home
-        </Item>
+        <Link to='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Logo>
+            <Img src={logo} alt={logo} />
+            NaskoTube
+          </Logo>
+        </Link>
+        <Link to='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Item>
+            <HomeIcon />
+            Home
+          </Item>
+        </Link>
         <Item>
           <ExploreOutlinedIcon />
           Explore
@@ -112,12 +120,17 @@ const Menu = ({ darkMode, setDarkMode }) => {
           History
         </Item>
         <Hr />
-        <Title>Sign in to like videos, comment and subscribe.</Title>
-        <Button>
-          <AccountCircleOutlinedIcon />
-          SIGN IN
-        </Button>
+        <Login>
+          Sign in to like videos, comment and subscribe.
+          <Link to='signin' style={{ textDecoration: 'none' }}>
+            <Button>
+              <AccountCircleOutlinedIcon />
+              SIGN IN
+            </Button>
+          </Link>
+        </Login>
         <Hr />
+        <Title>Best of NaskoTube</Title>
         <Item>
           <LibraryMusicOutlinedIcon />
           Music
@@ -157,7 +170,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
         </Item>
         <Item onClick={() => setDarkMode(!darkMode)}>
           <SettingsBrightnessOutlinedIcon />
-          Light Mode
+          {darkMode ? 'Light' : 'Dark'} Mode
         </Item>
       </Wrapper>
     </Container>
