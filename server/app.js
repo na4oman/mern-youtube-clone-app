@@ -6,6 +6,7 @@ import userRoutes from './routes/users.js'
 import videoRoutes from './routes/videos.js'
 import commentRouter from './routes/comments.js'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ const connectDB = () => {
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors())
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/videos', videoRoutes)

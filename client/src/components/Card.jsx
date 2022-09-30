@@ -1,5 +1,9 @@
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { format } from 'timeago.js'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 const Container = styled.div`
   width: ${props => props.type !== 'sm' && '360px'};
@@ -54,24 +58,42 @@ const InfoDetails = styled.span`
   color: ${({ theme }) => theme.textSoft};
 `
 
-const Card = ({ type }) => {
+const IconBox = styled.div`
+  color: ${({ theme }) => theme.text};
+  margin-left: auto;
+`
+
+const Card = ({ type, video }) => {
+  const [channel, setChannel] = useState({})
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await axios.get(
+        `http://localhost:8800/api/users/find/${video.userId}`
+      )
+      // console.log(res.data)
+      setChannel(res.data)
+    }
+
+    fetchUser()
+  }, [video.userId])
+
   return (
-    <Link to='video/test' style={{ textDecoration: 'none' }}>
+    <Link to={`../../video/${video?._id}`} style={{ textDecoration: 'none' }}>
       <Container type={type}>
-        <CardImage
-          type={type}
-          src='https://i.ytimg.com/vi/_zIkQuqc0EQ/hqdefault.jpg?sqp=-oaymwEXCOADEI4CSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLBaPWk2ema98bfWYkdkKMovAtjdUg'
-        />
+        <CardImage type={type} src={video.imgUrl} />
         <CardContent type={type}>
-          <ChannelImage
-            type={type}
-            src='https://avatars.githubusercontent.com/u/46356794?s=96&v=4'
-          />
+          <ChannelImage type={type} src={channel.img} />
           <ChannelContent>
-            <Title>Create a Full MERN Stack App</Title>
-            <Channel>Nasko Dev</Channel>
-            <InfoDetails>660,549 views • 2 years ago</InfoDetails>
+            <Title>{video.title}</Title>
+            <Channel>{channel.name}</Channel>
+            <InfoDetails>
+              {video.views} views • {format(video.createdAt)}
+            </InfoDetails>
           </ChannelContent>
+          <IconBox>
+            <MoreVertIcon fontSize='small' />
+          </IconBox>
         </CardContent>
       </Container>
     </Link>

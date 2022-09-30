@@ -3,10 +3,18 @@ import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined'
 import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutlined'
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined'
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined'
-// import ThumbDownIcon from '@mui/icons-material/ThumbDown'
-// import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import Comments from '../components/Comments'
-import Card from '../components/Card'
+import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { format } from 'timeago.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchSuccess, likeVideo, dislikeVideo } from '../redux/videoSlice'
+import { subscribe } from '../redux/userSlice'
+import Recommendation from '../components/Recommendation'
 
 const Container = styled.div`
   display: flex;
@@ -19,11 +27,11 @@ const Content = styled.div`
 
 const VideoWrapper = styled.div``
 
-// const VideoFrame = styled.video`
-//   max-height: 720px;
-//   width: 100%;
-//   object-fit: cover;
-// `
+const VideoFrame = styled.video`
+  max-height: 720px;
+  width: 100%;
+  object-fit: cover;
+`
 
 const Title = styled.h1`
   font-size: 18px;
@@ -114,40 +122,73 @@ const Subscribe = styled.button`
   cursor: pointer;
 `
 
-const Recommendations = styled.div`
-  flex: 2;
+const IconBox = styled.div`
+  color: ${({ theme }) => theme.text};
+  margin-left: auto;
+  cursor: pointer;
 `
 
 const Video = () => {
+  const { videoId } = useParams()
+  const [channel, setChannel] = useState({})
+  const { currentVideo } = useSelector(state => state.video)
+  const { currentUser } = useSelector(state => state.user)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const videoRes = await axios.get(`/videos/find/${videoId}`)
+      const channelRes = await axios.get(`/users/find/${videoRes.data.userId}`)
+
+      dispatch(fetchSuccess(videoRes.data))
+      setChannel(channelRes.data)
+    }
+    fetchData()
+  }, [videoId, dispatch])
+
+  const handleLike = async () => {
+    await axios.put(`/users/like/${currentVideo._id}`)
+    dispatch(likeVideo(currentUser._id))
+  }
+
+  const handleDislike = async () => {
+    await axios.put(`/users/dislike/${currentVideo._id}`)
+    dispatch(dislikeVideo(currentUser._id))
+  }
+
+  const handleSubscribe = async () => {
+    currentUser.subscribedChannels.includes(channel._id)
+      ? await axios.put(`/users/unsub/${channel._id}`)
+      : await axios.put(`/users/sub/${channel._id}`)
+    dispatch(subscribe(channel._id))
+  }
+
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          {/* <VideoFrame controls>
-            <source
-              // src='https://www.youtube.com/watch?v=AORG9W-41z4'
-              src='https://www.youtube.com/embed/k3Vfj-e1Ma4'
-              type='video/mp4'
-            ></source>
-          </VideoFrame> */}
-          <iframe
-            width='100%'
-            height='420'
-            src='https://www.youtube.com/embed/k3Vfj-e1Ma4'
-            title='YouTube video player'
-            frameborder='0'
-            allowFullScreen
-            allow='accelerometer; autoplay; clipboard-write'
-          ></iframe>
-          <Title>Create a Full MERN Stack - Youtube clone</Title>
+          <VideoFrame src={currentVideo?.videoUrl} controls />
+          <Title>{currentVideo?.title}</Title>
           <Details>
-            <Info>2,744,563 views • Jun 22, 2022</Info>
+            <Info>
+              {currentVideo?.views} views • {format(currentVideo?.createdAt)}
+            </Info>
             <Buttons>
-              <Button>
-                <ThumbUpOutlinedIcon /> 123
+              <Button onClick={handleLike}>
+                {currentVideo?.likes?.includes(currentUser?._id) ? (
+                  <ThumbUpIcon />
+                ) : (
+                  <ThumbUpOutlinedIcon />
+                )}{' '}
+                {currentVideo?.likes?.length}
               </Button>
-              <Button>
-                <ThumbDownOffAltOutlinedIcon /> Dislike
+              <Button onClick={handleDislike}>
+                {currentVideo?.likes?.includes(currentUser?._id) ? (
+                  <ThumbDownOffAltOutlinedIcon />
+                ) : (
+                  <ThumbDownIcon />
+                )}{' '}
+                Dislike
               </Button>
               <Button>
                 <ReplyOutlinedIcon /> Share
@@ -155,6 +196,9 @@ const Video = () => {
               <Button>
                 <AddTaskOutlinedIcon /> Save
               </Button>
+              <IconBox>
+                <MoreHorizIcon />
+              </IconBox>
             </Buttons>
           </Details>
           <Hr />
@@ -162,40 +206,24 @@ const Video = () => {
             <ChannelInfo>
               <ChannelImage src='https://avatars.githubusercontent.com/u/46356794?s=96&v=4' />
               <ChannelDetail>
-                <ChannelName>Nasko Dev</ChannelName>
-                <ChannelCounter>150K subscribers</ChannelCounter>
-                <ChannelDescription>
-                  Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                  Ratione, itaque doloribus iure explicabo eveniet quidem cumque
-                  facilis animi veniam maxime dolore obcaecati nulla ipsam,
-                  magni architecto ab possimus pariatur dignissimos.
-                </ChannelDescription>
+                <ChannelName>{channel.name}</ChannelName>
+                <ChannelCounter>
+                  {channel.subscribers} subscribers
+                </ChannelCounter>
+                <ChannelDescription>{currentVideo?.desc}</ChannelDescription>
               </ChannelDetail>
             </ChannelInfo>
-            <Subscribe>SUBSCRIBE</Subscribe>
+            <Subscribe onClick={handleSubscribe}>
+              {currentUser?.subscribedChannels?.includes(channel._id)
+                ? 'SUBSCRIBED'
+                : 'SUBSCRIBE'}
+            </Subscribe>
           </Channel>
           <Hr />
         </VideoWrapper>
-        <Comments />
+        <Comments videoId={currentVideo?._id} />
       </Content>
-      <Recommendations>
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-        <Card type='sm' />
-      </Recommendations>
+      <Recommendation tags={currentVideo.tags} />
     </Container>
   )
 }
